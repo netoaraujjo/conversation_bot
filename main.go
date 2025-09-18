@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
@@ -9,6 +10,7 @@ import (
 
 	"sync"
 	"time"
+
 	"github.com/joho/godotenv"
 )
 
@@ -31,7 +33,7 @@ func main() {
 }
 
 func buscaProcedimentos(cpf string, wg *sync.WaitGroup) {
-	fmt.Println("Iniciando busca de antecedentes")
+	// fmt.Println("Iniciando busca de antecedentes")
 	baseURL := "https://lupa.ssp.pi.gov.br/api/v1/"
 
 	req, err := http.NewRequest("GET", baseURL+"procedimentos-policiais/suposto-autor-infrator/", nil)
@@ -43,10 +45,16 @@ func buscaProcedimentos(cpf string, wg *sync.WaitGroup) {
 	q.Add("cpf", cpf)
 	req.URL.RawQuery = q.Encode()
 
-	req.Header.Set("Authorization", "Api-Key " + os.Getenv("LUPA_API_KEY"))
+	req.Header.Set("Authorization", "Api-Key "+os.Getenv("LUPA_API_KEY"))
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -59,11 +67,11 @@ func buscaProcedimentos(cpf string, wg *sync.WaitGroup) {
 		panic(err)
 	}
 	// fmt.Println(string(result))
-	fmt.Println("Finalizada busca de antecedentes")
+	// fmt.Println("Finalizada busca de antecedentes")
 }
 
 func buscaIBIOSEG(cpf string, wg *sync.WaitGroup) {
-	fmt.Println("Iniciando busca no IBIOSEG")
+	// fmt.Println("Iniciando busca no IBIOSEG")
 	baseURL := "https://lupa.ssp.pi.gov.br/api/v1/"
 
 	req, err := http.NewRequest("GET", baseURL+"ibioseg/pessoa/", nil)
@@ -78,7 +86,15 @@ func buscaIBIOSEG(cpf string, wg *sync.WaitGroup) {
 	req.Header.Set("Authorization", "Api-Key 4bcrvRhr.Gw6FKS6hZAhyuboVyK7pK6xFsbh5JUNb")
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -90,11 +106,11 @@ func buscaIBIOSEG(cpf string, wg *sync.WaitGroup) {
 		panic(err)
 	}
 	// fmt.Println(string(result))
-	fmt.Println("Finalizada busca no IBIOSEG")
+	// fmt.Println("Finalizada busca no IBIOSEG")
 }
 
 func buscaRENACH(cpf string, wg *sync.WaitGroup) {
-	fmt.Println("Iniciando busca no RENACH")
+	// fmt.Println("Iniciando busca no RENACH")
 	baseURL := "https://lupa.ssp.pi.gov.br/api/v1/"
 
 	req, err := http.NewRequest("GET", baseURL+"detran/veiculo/renach/", nil)
@@ -111,7 +127,15 @@ func buscaRENACH(cpf string, wg *sync.WaitGroup) {
 	req.Header.Set("Authorization", "Api-Key 4bcrvRhr.Gw6FKS6hZAhyuboVyK7pK6xFsbh5JUNb")
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -123,5 +147,5 @@ func buscaRENACH(cpf string, wg *sync.WaitGroup) {
 		panic(err)
 	}
 	// fmt.Println(string(result))
-	fmt.Println("Finalizada busca no RENACH")
+	// fmt.Println("Finalizada busca no RENACH")
 }
