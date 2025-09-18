@@ -1,0 +1,1 @@
+Bot de conversação em go para fins de estudo.
