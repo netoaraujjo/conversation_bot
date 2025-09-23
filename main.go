@@ -17,6 +17,13 @@ type Usuario struct {
 	Parameters map[string]string
 }
 
+var searchOptionsKeyboard = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("Celular", "celular"),
+		tgbotapi.NewInlineKeyboardButtonData("Pessoa", "pessoa"),
+	),
+)
+
 func main() {
 	// Carrega variáveis de ambiente
 	err := godotenv.Load()
@@ -51,13 +58,23 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			if update.Message.IsCommand() {
-				fmt.Println(update.Message.Command())
-				println("É um comando")
+			switch update.Message.Command() {
+			case "start":
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Selecione uma oção abaixo:")
+				msg.ReplyMarkup = searchOptionsKeyboard
+				bot.Send(msg)
 			}
+			
+			// if update.Message.IsCommand() {
+			// 	fmt.Println(update.Message.Command())
+			// 	println("É um comando")
+			// }
 			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			// msg.ReplyToMessageID = update.Message.MessageID
 			// bot.Send(msg)
+		}
+		if update.CallbackQuery != nil {
+			fmt.Println(update.CallbackData())
 		}
 	}
 }
