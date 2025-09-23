@@ -38,12 +38,12 @@ func start(bot *tgbotapi.BotAPI, update tgbotapi.Update, usuario *Usuario) {
 }
 
 type Handler struct {
-	States map[int]func(bot *tgbotapi.BotAPI, update tgbotapi.Update, usuario *Usuario)
+	States map[int][]func(bot *tgbotapi.BotAPI, update tgbotapi.Update, usuario *Usuario)
 }
 
 func newHandler() *Handler {
 	return &Handler{
-		States: make(map[int]func(bot *tgbotapi.BotAPI, update tgbotapi.Update, usuario *Usuario)),
+		States: make(map[int][]func(bot *tgbotapi.BotAPI, update tgbotapi.Update, usuario *Usuario)),
 	}
 }
 
@@ -94,7 +94,7 @@ func main() {
 	}
 
 	handler := newHandler()
-	handler.States[START] = start
+	handler.States[START] = []func(bot *tgbotapi.BotAPI, update tgbotapi.Update, usuario *Usuario){start}
 	handler.States[TIPO_DA_BUSCA] = selecionaTipoBusca
 
 	usuario := &Usuario{
@@ -103,36 +103,7 @@ func main() {
 
 	for update := range updates {
 
-		handler.States[usuario.State](bot, update, usuario)
+		
 
-		// if update.Message != nil {
-		// 	log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-		// 	// switch update.Message.Command() {
-		// 	// case "start", "iniciar":
-
-		// 	// case "meuid":
-		// 	// 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Seu id do Telegram, toque no número para copiar: `%d`", update.Message.Chat.ID))
-		// 	// 	msg.ReplyMarkup = searchOptionsKeyboard
-		// 	// 	msg.ParseMode = tgbotapi.ModeMarkdownV2
-		// 	// 	bot.Send(msg)
-		// 	// }
-
-		// 	// if update.Message.IsCommand() {
-		// 	// 	fmt.Println(update.Message.Command())
-		// 	// 	println("É um comando")
-		// 	// }
-		// 	// msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		// 	// msg.ReplyToMessageID = update.Message.MessageID
-		// 	// bot.Send(msg)
-		// }
-		// if update.CallbackQuery != nil {
-		// 	// fmt.Println(update.CallbackData())
-		// 	switch update.CallbackData() {
-		// 	case "pessoa":
-		// 		fmt.Println("Selecionou a opção Pessoa")
-		// 	case "celular":
-		// 		fmt.Println("Selecionou a opção Celular")
-		// 	}
-		// }
 	}
 }
