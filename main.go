@@ -1,12 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 )
+
+type Usuario struct {
+	State      int
+	ID         int
+	Name       string
+	Username   string
+	Parameters map[string]string
+}
 
 func main() {
 	// Carrega variáveis de ambiente
@@ -26,11 +35,14 @@ func main() {
 
 	updates := bot.GetUpdatesChan(tgbotapi.NewUpdate(0))
 
+	// Configura os comandos do bot
 	commands := []tgbotapi.BotCommand{
-		{Command: "start", Description: "Inicia a interação"},
-		{Command: "help", Description: "Ajuda"},
+		{Command: "iniciar", Description: "Inicia uma nova interação"},
+		{Command: "cancelar", Description: "Cancela a consulta atual"},
+		{Command: "resetar", Description: "Limpa os dados da consulta atual"},
+		{Command: "meuid", Description: "Exibe o ID do Telegram"},
+		{Command: "ajuda", Description: "Ajuda"},
 	}
-
 	cfg := tgbotapi.NewSetMyCommands(commands...)
 	if _, err := bot.Request(cfg); err != nil {
 		log.Panic(err)
@@ -40,6 +52,7 @@ func main() {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			if update.Message.IsCommand() {
+				fmt.Println(update.Message.Command())
 				println("É um comando")
 			}
 			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
