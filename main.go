@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -44,5 +45,6 @@ func main() {
 	updates := bot.GetUpdatesChan(tgbotapi.NewUpdate(0))
 
 	for update := range updates {
+		fmt.Println(update.Message)
 	}
 }
