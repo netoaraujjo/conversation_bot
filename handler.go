@@ -1,6 +1,8 @@
 package main
 
 import (
+	"regexp"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -42,6 +44,13 @@ func CallbackQueryHandler(data string) MatcherFunc {
 	}
 }
 
+func PatternHandler(pattern string) MatcherFunc {
+	re := regexp.MustCompile(pattern)
+	return func(update tgbotapi.Update) bool {
+		return update.Message != nil && re.MatchString(update.Message.Text)
+	}
+}
+
 type ConversationHandler struct {
 	EntryPoints []EventHandler
 	States      map[int64][]EventHandler
@@ -69,12 +78,21 @@ func (ch *ConversationHandler) HandleUpdate(bot *tgbotapi.BotAPI, update tgbotap
 				return
 			}
 		}
-		return
 	}
 
-	for _, h := range ch.States[ch.State] {
+	if ch.State > -1 {
+		for _, h := range ch.States[ch.State] {
+			if h.Match(update) {
+				ch.State = h.Handler(bot, update)
+				return
+			}
+		}
+	}
+
+	for _, h := range ch.Fallbacks {
 		if h.Match(update) {
-			ch.State = h.Handler(bot, update)
+			ch.State = -1
+			h.Handler(bot, update)
 			return
 		}
 	}

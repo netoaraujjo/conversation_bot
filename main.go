@@ -24,8 +24,8 @@ const (
 func NewConversation() *ConversationHandler {
 	ch := NewConversationHandler()
 	ch.EntryPoints = []EventHandler{
-		{Match: MessageHandler(TEXT), Handler: handleMessageText},
-		{Match: MessageHandler(PHOTO), Handler: handleMessagePhoto},
+		{Match: MessageHandler(TEXT), Handler: handleCommandStart},
+		// {Match: MessageHandler(PHOTO), Handler: handleMessagePhoto},
 		{Match: CommandHandler("start"), Handler: handleCommandStart},
 		{Match: CommandHandler("iniciar"), Handler: handleCommandStart},
 		{Match: CommandHandler("ajuda"), Handler: handleCommandAjuda},
@@ -36,6 +36,10 @@ func NewConversation() *ConversationHandler {
 	ch.States[TIPO_DA_BUSCA] = []EventHandler{
 		{Match: CallbackQueryHandler("pessoa"), Handler: handleTipoBusca},
 		{Match: CallbackQueryHandler("celular"), Handler: handleTipoBusca},
+	}
+	ch.Fallbacks = []EventHandler{
+		{Match: CommandHandler("cancelar"), Handler: handleCommandCancelar},
+		{Match: PatternHandler(`^.*$`), Handler: handlerPattern},
 	}
 	return ch
 }

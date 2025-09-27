@@ -49,7 +49,7 @@ func handleCommandAjuda(bot *tgbotapi.BotAPI, update tgbotapi.Update) int64 {
 
 func handleCommandCancelar(bot *tgbotapi.BotAPI, update tgbotapi.Update) int64 {
 	fmt.Println("Tratando comando cancelar")
-	return 0
+	return END
 }
 
 func handleCommandResetar(bot *tgbotapi.BotAPI, update tgbotapi.Update) int64 {
@@ -66,5 +66,10 @@ func handleTipoBusca(bot *tgbotapi.BotAPI, update tgbotapi.Update) int64 {
 	bot.Request(tgbotapi.NewCallback(update.CallbackQuery.ID, ""))
 	tipoBusca := update.CallbackData()
 	fmt.Printf("Opção selecionada: %s\n", tipoBusca)
+	return END
+}
+
+func handlerPattern(bot *tgbotapi.BotAPI, update tgbotapi.Update) int64 {
+	fmt.Println("Tratando pattern no fallback")
 	return END
 }
